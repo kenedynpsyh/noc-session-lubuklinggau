@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "lib": ["es5", "dom.iterable", "esnext.asynciterable"],
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+      "@serve/*": ["./serve/*"]
+    }
+  },
+  "include": ["serve/**/*.ts", "serve/**/*.js"],
+  "exclude": ["node_modules"]
+}
