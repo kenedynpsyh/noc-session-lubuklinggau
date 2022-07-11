@@ -1,0 +1,23 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@3.0.0
+
+jobs:
+  noc-lubuklinggau:
+    executor:
+      name: node/default
+      tag: "16.13"
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+          override-ci-command: yarn install
+      - run:
+          command: yarn test
+          name: run yarn circleci unittest
+
+workflows:
+  startup-lubuklinggau:
+    jobs:
+      - noc-lubuklinggau
