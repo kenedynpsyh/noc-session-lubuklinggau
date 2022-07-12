@@ -2,6 +2,7 @@ import { Express } from "express";
 import { Action, useContainer, useExpressServer } from "routing-controllers";
 import Container from "typedi";
 import jsonwebtoken from "jsonwebtoken";
+import { UserController } from "@serve/app/controller/user-controller";
 
 useContainer(Container);
 
@@ -14,7 +15,7 @@ export abstract class BaseRouting {
   public controller(app: Express) {
     useExpressServer(app, {
       routePrefix: "/api/v1/",
-      controllers: [],
+      controllers: [UserController],
       middlewares: [],
       interceptors: [],
       currentUserChecker: async function (action: Action, roles?: any[]) {
@@ -23,7 +24,7 @@ export abstract class BaseRouting {
         if (token) {
           token = token.split("Bearer ")[1];
         }
-        return Boolean(token);
+        return ((await jsonwebtoken.decode(token)) as any)?.user;
       },
       authorizationChecker: async function (action: Action) {
         let token = null;
@@ -32,7 +33,7 @@ export abstract class BaseRouting {
         if (token) {
           token = token.split("Bearer ")[1];
         }
-        return ((await jsonwebtoken.decode(token)) as any)?.user;
+        return Boolean(token);
       },
     });
   }
