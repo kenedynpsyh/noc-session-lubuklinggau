@@ -13,9 +13,14 @@ import {
 } from "../fields/user-fields";
 import createError from "http-errors";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR, CREATED, OK } from "http-status";
-import { nocRoles, nocUsers } from "@serve/database/associate/user-associate";
+import {
+  nocRoles,
+  nocUserLogs,
+  nocUsers,
+} from "@serve/database/associate/user-associate";
 import { createPath, removePath, ticket } from "@serve/utils/system";
 import { env } from "@serve/utils/env";
+import { Op } from "sequelize";
 
 @Service()
 export class UserService {
@@ -94,10 +99,25 @@ export class UserService {
       algorithm: "RS256",
     });
     find.save();
+    await nocUserLogs.create({ public_id: nanoid(), user_id: find.public_id });
     if (env["test"]) {
       createPath("../../tests/token.txt", find.api_token);
     }
     return { status: OK, token: find.api_token };
+  }
+
+  /**
+   * logoutService
+   */
+  public async logoutService(user_id: string) {
+    const find = await nocUserLogs.findOne({
+      where: { [Op.and]: [{ user_id }, { logoutAt: { [Op.is]: null } }] },
+    });
+    if (!find) {
+      return createError(INTERNAL_SERVER_ERROR, "false");
+    }
+    find.update({ logoutAt: new Date() });
+    return { status: OK };
   }
 
   /**

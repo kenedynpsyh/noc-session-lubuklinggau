@@ -81,6 +81,17 @@ describe("user::unittest", () => {
         });
     });
 
+    it("me", async () => {
+      await supertest(app.app)
+        .get("/api/v1/user/me")
+        .set("content-type", "application/json")
+        .set("authorization", `Bearer ${token}`)
+        .expect(OK)
+        .then((res) => {
+          expect(res.body).not.toEqual(null);
+        });
+    });
+
     it("update roles", async () => {
       await supertest(app.app)
         .post("/api/v1/user/roles")
@@ -119,6 +130,17 @@ describe("user::unittest", () => {
         .expect(OK)
         .then((res) => {
           expect(res.body.message).toEqual("Profile has been updated");
+        });
+    });
+
+    it("log out an accounts", async () => {
+      await supertest(app.app)
+        .get("/api/v1/user/logout")
+        .set("content-type", "application/json")
+        .set("authorization", `Bearer ${token}`)
+        .expect(OK)
+        .then((res) => {
+          expect(res.body.status).toEqual(OK);
         });
     });
   }

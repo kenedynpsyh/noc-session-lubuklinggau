@@ -1,3 +1,7 @@
+import {
+  user_exclude,
+  user_include,
+} from "@serve/database/associate/user-associate";
 import nocUsers, {
   UserInstance,
 } from "@serve/database/models/auth/user-models";
@@ -17,11 +21,28 @@ export class UserRepository {
   }
 
   /**
+   * findsOneRepository
+   */
+  public async findsOneRepository(where: {
+    [key: string]: any;
+  }): Promise<UserInstance> {
+    return await nocUsers.findOne({
+      where: where,
+      attributes: { exclude: user_exclude },
+      include: user_include,
+    });
+  }
+
+  /**
    * findallRepository
    */
   public async findallRepository(where: {
     [key: string]: any;
   }): Promise<UserInstance[]> {
-    return await nocUsers.findAll({ where: where });
+    return await nocUsers.findAll({
+      where: where,
+      attributes: { exclude: user_exclude },
+      include: user_include,
+    });
   }
 }

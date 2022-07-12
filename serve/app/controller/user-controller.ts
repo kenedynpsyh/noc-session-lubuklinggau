@@ -49,6 +49,20 @@ export class UserController {
     return res.status(OK).json(r);
   }
 
+  @Get("me")
+  @HttpCode(OK)
+  @ContentType("application/json")
+  @Authorized()
+  private async meController(
+    @CurrentUser() user: UserInstance,
+    @Res() res: Response
+  ): Promise<Response> {
+    const r = await this.repository.findsOneRepository({
+      public_id: user.public_id,
+    });
+    return res.status(OK).json(r);
+  }
+
   @Get("one")
   @HttpCode(OK)
   @ContentType("application/json")
@@ -69,6 +83,18 @@ export class UserController {
     @Res() res: Response
   ): Promise<Response> {
     const r = await this.service.loginService(body);
+    return res.status(r.status).json(r);
+  }
+
+  @Get("logout")
+  @HttpCode(OK)
+  @ContentType("application/json")
+  @Authorized()
+  private async logoutController(
+    @CurrentUser() user: UserInstance,
+    @Res() res: Response
+  ): Promise<Response> {
+    const r = await this.service.logoutService(user.public_id);
     return res.status(r.status).json(r);
   }
 
