@@ -24,7 +24,7 @@ export abstract class BaseRouting {
         if (token) {
           token = token.split("Bearer ")[1];
         }
-        return Boolean(token);
+        return ((await jsonwebtoken.decode(token)) as any)?.user;
       },
       authorizationChecker: async function (action: Action) {
         let token = null;
@@ -33,7 +33,7 @@ export abstract class BaseRouting {
         if (token) {
           token = token.split("Bearer ")[1];
         }
-        return ((await jsonwebtoken.decode(token)) as any)?.user;
+        return Boolean(token);
       },
     });
   }

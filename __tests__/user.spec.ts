@@ -80,5 +80,46 @@ describe("user::unittest", () => {
           expect(res.body).not.toEqual(null);
         });
     });
+
+    it("update roles", async () => {
+      await supertest(app.app)
+        .post("/api/v1/user/roles")
+        .set("content-type", "application/json")
+        .set("authorization", `Bearer ${token}`)
+        .send({
+          first_name: faker.name.firstName(),
+          last_name: faker.name.lastName(),
+          gender: faker.helpers.arrayElement(["Male", "Female"]),
+          birthday: new Date().toISOString(),
+        })
+        .expect(OK)
+        .then((res) => {
+          expect(res.body.message).toEqual("Profile has been updated");
+        });
+    });
+
+    it("file avatar updated", async () => {
+      await supertest(app.app)
+        .post("/api/v1/user/roles/avatar")
+        .set("content-type", "multipart/form-data")
+        .set("authorization", `Bearer ${token}`)
+        .attach("file", "tokopedia.png")
+        .expect(OK)
+        .then((res) => {
+          expect(res.body.message).toEqual("Profile has been updated");
+        });
+    });
+
+    it("file background update", async () => {
+      await supertest(app.app)
+        .post("/api/v1/user/roles/background")
+        .set("content-type", "multipart/form-data")
+        .set("authorization", `Bearer ${token}`)
+        .attach("file", "tokopedia.png")
+        .expect(OK)
+        .then((res) => {
+          expect(res.body.message).toEqual("Profile has been updated");
+        });
+    });
   }
 });

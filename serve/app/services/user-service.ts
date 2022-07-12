@@ -5,6 +5,7 @@ import jsonwebtoken from "jsonwebtoken";
 import { pick } from "lodash";
 import { UserRepository } from "../repository/user-repository";
 import {
+  authorfield,
   createdfield,
   loginfield,
   passwordfield,
@@ -12,8 +13,8 @@ import {
 } from "../fields/user-fields";
 import createError from "http-errors";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR, CREATED, OK } from "http-status";
-import { nocUsers } from "@serve/database/associate/user-associate";
-import { createPath, ticket } from "@serve/utils/system";
+import { nocRoles, nocUsers } from "@serve/database/associate/user-associate";
+import { createPath, removePath, ticket } from "@serve/utils/system";
 import { env } from "@serve/utils/env";
 
 @Service()
@@ -28,6 +29,8 @@ export class UserService {
    * createdService
    */
   public async createdService(body: createdfield) {
+    let first_name: string = "",
+      last_name: string = "";
     const find = await this.repository.findoneRepository({ email: body.email });
     if (find) {
       return createError(
@@ -41,10 +44,28 @@ export class UserService {
         "Password don't match, please check again"
       );
     }
+    const split = body.fullname.split(" ");
+    first_name = split[0];
+    if (split.length > 1) {
+      for (let i = 0; i < split.length; i++) {
+        if (i !== 0) {
+          last_name += split[i];
+          if (split.length !== i) {
+            last_name += " ";
+          }
+        }
+      }
+    }
     body.password = this.password(body.password);
     const create = await nocUsers.create({
       public_id: nanoid(),
       ...pick(body, ["email", "password"]),
+    });
+    await nocRoles.create({
+      public_id: nanoid(),
+      first_name,
+      last_name,
+      user_id: create.public_id,
     });
     if (env["test"]) {
       createPath("../../tests/user.txt", JSON.stringify(create));
@@ -73,8 +94,8 @@ export class UserService {
       algorithm: "RS256",
     });
     find.save();
-    if(env['test']) {
-      createPath('../../tests/token.txt',find.api_token)
+    if (env["test"]) {
+      createPath("../../tests/token.txt", find.api_token);
     }
     return { status: OK, token: find.api_token };
   }
@@ -113,5 +134,40 @@ export class UserService {
     body.password = this.password(body.password);
     find.update(pick(body, ["password"]));
     return { status: OK, message: "Password has been updated" };
+  }
+
+  /**
+   * async roleService
+   */
+  public async roleService(body: authorfield, user_id: string) {
+    const result = await nocRoles.findOne({ where: { user_id } });
+    if (!result) {
+      return createError(INTERNAL_SERVER_ERROR, "false");
+    }
+    result.update(body);
+    return { status: OK, message: "Profile has been updated", result };
+  }
+
+  /**
+   * async fileService
+   */
+  public async fileService(
+    file: Express.Multer.File,
+    path: string,
+    user_id: string
+  ) {
+    const result = await nocRoles.findOne({ where: { user_id } });
+    if (!result) {
+      return createError(INTERNAL_SERVER_ERROR, "false");
+    }
+    const files = file.path.split("serve/");
+    if (files.length) {
+      try {
+        removePath(`../upload${result[path]}`);
+      } catch (error) {}
+      result[path] = files[1];
+    }
+    result.save();
+    return { status: OK, message: "Profile has been updated", result };
   }
 }

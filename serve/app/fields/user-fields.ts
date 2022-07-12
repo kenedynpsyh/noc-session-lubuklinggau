@@ -11,7 +11,7 @@ export class createdfield {
   password: string;
 
   @IsString()
-  confirmation: string
+  confirmation: string;
 }
 
 export class loginfield {
@@ -21,7 +21,6 @@ export class loginfield {
   @IsString()
   password: string;
 }
-
 
 export class resetfield {
   @IsString()
@@ -46,5 +45,19 @@ export class userQuery {
 
 export class baseQuery {
   @IsString()
-  public_id:string
+  public_id: string;
+}
+
+export class authorfield {
+  @IsString()
+  first_name: string;
+
+  @IsString()
+  last_name: string;
+
+  @IsString()
+  gender: string;
+
+  @IsString()
+  birthday: Date;
 }

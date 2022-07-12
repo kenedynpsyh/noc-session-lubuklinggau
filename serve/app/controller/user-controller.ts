@@ -6,15 +6,18 @@ import {
   CurrentUser,
   Get,
   HttpCode,
+  Param,
   Post,
   QueryParams,
   Res,
+  UploadedFile,
 } from "routing-controllers";
 import { Service } from "typedi";
 import { UserRepository } from "../repository/user-repository";
 import { UserService } from "../services/user-service";
 import { OK, CREATED } from "http-status";
 import {
+  authorfield,
   baseQuery,
   createdfield,
   loginfield,
@@ -24,6 +27,7 @@ import {
 } from "../fields/user-fields";
 import { Response } from "express";
 import { UserInstance } from "@serve/database/models/auth/user-models";
+import { fileUploadOptions } from "@serve/utils/system";
 
 @Controller("user/")
 @Service()
@@ -100,6 +104,35 @@ export class UserController {
     @Res() res: Response
   ): Promise<Response> {
     const r = await this.service.passwordService(body, user.public_id);
+    return res.status(r.status).json(r);
+  }
+
+  @Post("roles")
+  @HttpCode(OK)
+  @ContentType("application/json")
+  @Authorized()
+  private async rolesController(
+    @Body() body: authorfield,
+    @CurrentUser() user: UserInstance,
+    @Res() res: Response
+  ): Promise<Response> {
+    const r = await this.service.roleService(body, user.public_id);
+    return res.status(r.status).json(r);
+  }
+
+  @Post("roles/:path")
+  @HttpCode(OK)
+  @Authorized()
+  private async fileController(
+    @UploadedFile("file", {
+      options: fileUploadOptions("../upload/author"),
+    })
+    file: Express.Multer.File,
+    @Param("path") path: string,
+    @CurrentUser() user: UserInstance,
+    @Res() res: Response
+  ): Promise<Response> {
+    const r = await this.service.fileService(file, path, user.public_id);
     return res.status(r.status).json(r);
   }
 }

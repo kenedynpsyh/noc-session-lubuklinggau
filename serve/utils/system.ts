@@ -1,5 +1,7 @@
 import fs from "fs";
 import { join } from "path";
+import multer from "multer";
+import { nanoid } from "nanoid";
 
 export const createPath = (path: string, data: string) => {
   fs.writeFileSync(join(__dirname, path), data);
@@ -19,6 +21,17 @@ export const removePath = (path: string) => {
 
 export const ticket = fs.readFileSync(join(__dirname, "./jwtRS256.key"), {
   encoding: "utf-8",
+});
+
+export const fileUploadOptions = (path: string) => ({
+  storage: multer.diskStorage({
+    destination: (req: any, file: any, cb: any) => {
+      cb(null, joinPath(path));
+    },
+    filename: (req: any, file: Express.Multer.File, cb: any) => {
+      cb(null, `${nanoid()}.${file.mimetype.split("/")[1]}`);
+    },
+  }),
 });
 
 const fields = {};
