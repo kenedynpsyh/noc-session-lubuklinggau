@@ -17,7 +17,7 @@ export const removePath = (path: string) => {
   fs.unlinkSync(join(__dirname, path));
 };
 
-export const ticket = fs.readFileSync(join(__dirname, ""), {
+export const ticket = fs.readFileSync(join(__dirname, "./jwtRS256.key"), {
   encoding: "utf-8",
 });
 

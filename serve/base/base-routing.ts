@@ -2,6 +2,7 @@ import { Express } from "express";
 import { Action, useContainer, useExpressServer } from "routing-controllers";
 import Container from "typedi";
 import jsonwebtoken from "jsonwebtoken";
+import { UserController } from "@serve/app/controller/user-controller";
 
 useContainer(Container);
 
@@ -14,7 +15,7 @@ export abstract class BaseRouting {
   public controller(app: Express) {
     useExpressServer(app, {
       routePrefix: "/api/v1/",
-      controllers: [],
+      controllers: [UserController],
       middlewares: [],
       interceptors: [],
       currentUserChecker: async function (action: Action, roles?: any[]) {

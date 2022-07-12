@@ -8,7 +8,7 @@
   "scripts": {
     "start": "cross-env dev=true port=2134 ts-node-dev serve/main.ts",
     "test": "jest . --coverage --forceExit",
-    "test:watch": "jest . --coverage --watchAll"
+    "test:watch": "cross-env test=true jest . --coverage --watchAll"
   },
   "dependencies": {
     "@faker-js/faker": "^7.3.0",

@@ -11,9 +11,10 @@
     "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {
-      "@serve/*": ["./serve/*"]
+      "@serve/*": ["./serve/*"],
+      "@__tests__/*": ["./__tests__/*"]
     }
   },
-  "include": ["serve/**/*.ts", "serve/**/*.js"],
+  "include": ["serve/**/*.ts", "serve/**/*.js", "__tests__/**/*.spec.ts"],
   "exclude": ["node_modules"]
 }
